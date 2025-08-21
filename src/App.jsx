@@ -3,17 +3,18 @@ import Home from "./pages/Home";
 import Favorites from "./pages/Favorites";
 import Navbar from "./Components/navbar";
 import { useState } from "react";
+import { MovieProvider } from "./Contexts/MovieContext";
 
 function App() {
   const [searchQuery, setSearchQuery] = useState("");
   return (
-    <>
+    <MovieProvider>
       <Navbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
       <Routes>
         <Route path="/" element={<Home searchQuery={searchQuery} />} />
         <Route path="/favorites" element={<Favorites />} />
       </Routes>
-    </>
+    </MovieProvider>
   );
 }
 
