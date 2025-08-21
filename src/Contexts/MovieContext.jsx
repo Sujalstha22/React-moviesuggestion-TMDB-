@@ -12,6 +12,7 @@ export const MovieProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
+    console.log("Favorites updated:", favorites);
     localStorage.setItem("favorites", JSON.stringify(favorites));
   }, [favorites]);
 

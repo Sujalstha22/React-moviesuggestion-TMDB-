@@ -8,13 +8,13 @@ import { MovieProvider } from "./Contexts/MovieContext";
 function App() {
   const [searchQuery, setSearchQuery] = useState("");
   return (
-    <MovieProvider>
+    <>
       <Navbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
       <Routes>
         <Route path="/" element={<Home searchQuery={searchQuery} />} />
         <Route path="/favorites" element={<Favorites />} />
       </Routes>
-    </MovieProvider>
+    </>
   );
 }
 
