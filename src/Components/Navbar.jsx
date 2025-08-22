@@ -5,15 +5,22 @@ import { Search } from "lucide-react"; // import search icon
 const Navbar = ({ searchQuery, setSearchQuery }) => {
   const handleSearch = (e) => {
     e.preventDefault();
-    // You can handle search logic here if needed
     console.log("Searching for:", searchQuery);
   };
 
   return (
     <nav className="flex justify-between items-center bg-gray-900 px-6 py-4 sticky top-0 z-50 shadow-md">
       {/* Brand */}
-      <div className="text-yellow-400 text-xl font-bold hover:text-white transition-colors duration-300">
-        <Link to="/">Movie App</Link>
+      <div className="flex gap-7 text-yellow-400 text-xl font-bold transition-colors duration-300">
+        <Link className="hover:text-white" to="/">
+          Movie App
+        </Link>
+        <Link className="hover:text-white" to="/movie">
+          Movies
+        </Link>
+        <Link className="hover:text-white" to="/show">
+          Shows
+        </Link>
       </div>
 
       {/* Search Bar */}
