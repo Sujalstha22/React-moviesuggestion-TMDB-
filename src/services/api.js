@@ -18,5 +18,7 @@ export const searchMovies = async (query) => {
 };
 
 export const getShows = async () => {
-  const response = await fetch(`${BASE_URL}/shows/`);
+  const response = await fetch(`${BASE_URL}/tv/popular?api_key=${API_KEY}`);
+  const data = await response.json();
+  return data.results;
 };

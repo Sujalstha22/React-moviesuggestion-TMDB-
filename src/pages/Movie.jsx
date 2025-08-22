@@ -25,7 +25,7 @@ const Movie = ({ searchQuery }) => {
     };
 
     loadPopularMovies();
-  }, []); // run only once
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-900 text-white px-6 py-10">
