@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { getPopularMovies } from "../services/api";
-import PosterCard from "../Components/PosterCard";
+import PosterCard from "../components/PosterCard";
 
 export default function Movie({ searchQuery }) {
   const [movies, setMovies] = useState([]);

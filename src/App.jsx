@@ -1,12 +1,12 @@
 import { Route, Routes } from "react-router-dom";
 import Home from "./pages/Home";
 import Favorites from "./pages/Favorites";
-import Navbar from "./Components/Navbar";
+import Navbar from "./components/Navbar";
 import { useState } from "react";
 import { MovieProvider } from "./Contexts/MovieContext";
 import Movie from "./pages/Movie";
 import Show from "./pages/Show";
-import Footer from "./Components/Footer";
+import Footer from "./components/Footer";
 
 function App() {
   const [searchQuery, setSearchQuery] = useState("");

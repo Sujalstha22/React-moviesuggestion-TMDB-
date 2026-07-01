@@ -1,4 +1,4 @@
-import PosterCard from "../Components/PosterCard";
+import PosterCard from "../components/PosterCard";
 import { useMovieContext } from "../Contexts/useMovieContect";
 
 export default function Favorites() {

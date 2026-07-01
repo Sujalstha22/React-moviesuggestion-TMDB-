@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { getTVDetails } from "../services/api";
-import PosterCard from "../Components/PosterCard";
+import PosterCard from "../components/PosterCard";
 
 export default function Show() {
   const [shows, setShows] = useState([]);
