@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 
-import Hero from "../components/Hero";
-import PosterRow from "../components/PosterRow";
-import FeaturedClassic from "../components/FeaturedClassic";
+import Hero from "../Components/Hero";
+import PosterRow from "../Components/PosterRow";
+import FeaturedClassic from "../Components/FeaturedClassic";
 
 import {
   getTrendingToday,

@@ -5,8 +5,9 @@ import { useState } from "react";
 import { MovieProvider } from "./Contexts/MovieContext";
 import Movie from "./pages/Movie";
 import Show from "./pages/Show";
-import Footer from "./components/Footer";
+
 import Navbar from "./Components/Navbar";
+import Footer from "./Components/Footer";
 
 function App() {
   const [searchQuery, setSearchQuery] = useState("");
