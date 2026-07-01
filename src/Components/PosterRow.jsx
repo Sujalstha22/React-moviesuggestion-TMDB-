@@ -26,9 +26,9 @@ export default function PosterRow({
   if (!items.length) return null;
 
   return (
-    <section id={id} className="relative overflow-visible py-20 sm:py-24">
+    <section id={id} className="relative overflow-visible py-10 sm:py-6">
       {/* Section Header */}
-      <div className="mx-auto  flex max-w-7xl items-end justify-between px-6 lg:px-10">
+      <div className="mx-auto flex max-w-7xl items-end justify-between px-3 lg:px-5">
         <div>
           <p className="mb-3 text-xs font-semibold uppercase tracking-[0.32em] text-gold-soft">
             {eyebrow}
@@ -44,23 +44,7 @@ export default function PosterRow({
           <button
             onClick={() => scroll(-1)}
             aria-label="Scroll Left"
-            className="
-              group
-              flex
-              h-11
-              w-11
-              items-center
-              justify-center
-              rounded-xl
-              border
-              border-charcoal-line
-              bg-charcoal-soft/50
-              backdrop-blur-md
-              transition-all
-              duration-300
-              hover:border-gold-soft
-              hover:bg-gold-soft/10
-              hover:shadow-lg
+            className=" group flex h-11 w-11 items-center justify-center rounded-xl border border-charcoal-line bg-charcoal-soft/50 backdrop-blur-md transition-all duration-300 hover:border-gold-soft hover:bg-gold-soft/10 hover:shadow-lg
             "
           >
             <ChevronLeft
@@ -77,29 +61,7 @@ export default function PosterRow({
           <button
             onClick={() => scroll(1)}
             aria-label="Scroll Right"
-            className="
-              group
-              flex
-              h-11
-              w-11
-              items-center
-              justify-center
-
-              rounded-xl
-
-              border
-              border-charcoal-line
-
-              bg-charcoal-soft/50
-              backdrop-blur-md
-
-              transition-all
-              duration-300
-
-              hover:border-gold-soft
-              hover:bg-gold-soft/10
-              hover:shadow-lg
-            "
+            className=" group flex h-11 w-11 items-center justify-center rounded-xl border border-charcoal-line bg-charcoal-soft/50 backdrop-blur-md transition-all duration-300 hover:border-gold-soft hover:bg-gold-soft/10 hover:shadow-lg"
           >
             <ChevronRight
               size={18}
