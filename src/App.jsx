@@ -1,12 +1,12 @@
 import { Route, Routes } from "react-router-dom";
 import Home from "./pages/Home";
-import Favorites from "./pages/Favorites";
-import Navbar from "./components/Navbar";
+
 import { useState } from "react";
 import { MovieProvider } from "./Contexts/MovieContext";
 import Movie from "./pages/Movie";
 import Show from "./pages/Show";
 import Footer from "./components/Footer";
+import Navbar from "./Components/Navbar";
 
 function App() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -15,7 +15,6 @@ function App() {
       <Navbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/favorites" element={<Favorites />} />
         <Route path="/movie" element={<Movie searchQuery={searchQuery} />} />
         <Route path="/show" element={<Show />} />
       </Routes>
