@@ -1,7 +1,7 @@
 import { Route, Routes } from "react-router-dom";
 import Home from "./pages/Home";
 import Favorites from "./pages/Favorites";
-import Navbar from "./Components/navbar";
+import Navbar from "./Components/Navbar";
 import { useState } from "react";
 import { MovieProvider } from "./Contexts/MovieContext";
 import Movie from "./pages/Movie";
