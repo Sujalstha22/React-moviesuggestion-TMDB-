@@ -6,6 +6,7 @@ import { useState } from "react";
 import { MovieProvider } from "./Contexts/MovieContext";
 import Movie from "./pages/Movie";
 import Show from "./pages/Show";
+import Footer from "./Components/Footer";
 
 function App() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -18,6 +19,7 @@ function App() {
         <Route path="/movie" element={<Movie searchQuery={searchQuery} />} />
         <Route path="/show" element={<Show />} />
       </Routes>
+      <Footer />
     </>
   );
 }

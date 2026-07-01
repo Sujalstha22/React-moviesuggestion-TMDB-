@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Search, Film, X } from "lucide-react";
-import { titles } from "../data/media";
 import { scrollToId, tmdbUrl } from "../lib/scroll";
+import { searchMovies } from "../services/api";
 
 const links = [
   { id: "trending", label: "Trending" },
@@ -12,6 +12,7 @@ const links = [
 ];
 
 export default function Navbar() {
+  const [results, setResults] = useState([]);
   const [scrolled, setScrolled] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -28,26 +29,70 @@ export default function Navbar() {
     if (searchOpen) inputRef.current?.focus();
   }, [searchOpen]);
 
-  const results = query.trim()
-    ? titles
-        .filter((t) =>
-          t.title.toLowerCase().includes(query.trim().toLowerCase()),
-        )
-        .slice(0, 6)
-    : [];
+  useEffect(() => {
+    if (query === "") {
+      setResults([]);
+      return;
+    }
+
+    const timeout = setTimeout(async () => {
+      const data = await searchMovies(query);
+      setResults(data);
+    }, 300);
+
+    return () => clearTimeout(timeout);
+  }, [query]);
 
   return (
-    <header
-      className={`fixed inset-x-0 top-0 z-50 transition-all duration-500 ${
-        scrolled
-          ? "bg-ink/90 backdrop-blur-md border-b border-charcoal-line/70"
-          : "bg-gradient-to-b from-black/70 to-transparent"
-      }`}
-    >
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-10">
+    <header className="fixed inset-x-0 top-0 z-50">
+      {/* ================= GLOBAL GRADIENT BACKDROP ================= */}
+      <div
+        className="
+          pointer-events-none
+          absolute
+          inset-0
+          bg-gradient-to-b
+          from-black/90
+          via-black/60
+          to-transparent
+        "
+      />
+
+      {/* ================= NAV BAR ================= */}
+      <div
+        className={`
+          relative
+          mx-auto
+          flex
+          max-w-7xl
+          items-center
+          justify-between
+          px-6
+          py-4
+          lg:px-10
+
+          transition-all
+          duration-500
+
+          ${
+            scrolled
+              ? "bg-black/40 backdrop-blur-xl border-b border-white/10 shadow-[0_10px_40px_rgba(0,0,0,0.6)]"
+              : "bg-transparent"
+          }
+        `}
+      >
+        {/* LOGO */}
         <button
           onClick={() => scrollToId("home")}
-          className="flex items-center gap-2 font-display text-2xl tracking-wide text-bone"
+          className="
+            flex
+            items-center
+            gap-2
+            font-display
+            text-2xl
+            tracking-wide
+            text-white
+          "
         >
           <Film className="h-5 w-5 text-gold" strokeWidth={1.5} />
           <span>
@@ -55,23 +100,49 @@ export default function Navbar() {
           </span>
         </button>
 
+        {/* NAV LINKS */}
         <nav className="hidden items-center gap-9 lg:flex">
           {links.map((l) => (
             <button
               key={l.id}
               onClick={() => scrollToId(l.id)}
-              className="text-[13px] font-medium uppercase tracking-[0.14em] text-fog transition-colors duration-300 hover:text-gold-soft"
+              className="
+                text-[13px]
+                font-medium
+                uppercase
+                tracking-[0.14em]
+                text-white/80
+                transition-colors
+                duration-300
+                hover:text-gold-soft
+              "
             >
               {l.label}
             </button>
           ))}
         </nav>
 
+        {/* SEARCH */}
         <div className="relative flex items-center">
           <button
             aria-label="Search titles"
             onClick={() => setSearchOpen((s) => !s)}
-            className="flex h-10 w-10 items-center justify-center rounded-[10px] border border-charcoal-line/80 text-bone transition-colors hover:border-gold/60 hover:text-gold-soft"
+            className="
+              flex
+              h-10
+              w-10
+              items-center
+              justify-center
+              rounded-[10px]
+              border
+              border-white/15
+              bg-black/20
+              text-white
+              backdrop-blur-md
+              transition-all
+              hover:border-gold/60
+              hover:text-gold-soft
+            "
           >
             {searchOpen ? (
               <X className="h-4 w-4" />
@@ -80,15 +151,46 @@ export default function Navbar() {
             )}
           </button>
 
+          {/* SEARCH DROPDOWN */}
           {searchOpen && (
-            <div className="absolute right-0 top-14 w-[320px] rounded-[10px] border border-charcoal-line bg-charcoal-soft/98 p-3 shadow-2xl shadow-black/60 sm:w-[380px]">
+            <div
+              className="
+                absolute
+                right-0
+                top-14
+                w-[320px]
+                sm:w-[380px]
+                rounded-[12px]
+                border
+                border-white/10
+                bg-black/70
+                backdrop-blur-2xl
+                shadow-2xl
+                shadow-black/70
+                p-3
+              "
+            >
               <input
                 ref={inputRef}
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search films & shows…"
-                className="w-full rounded-[8px] border border-charcoal-line bg-ink px-3 py-2.5 text-sm text-bone placeholder:text-fog/70 outline-none focus:border-gold/60"
+                className="
+                  w-full
+                  rounded-[8px]
+                  border
+                  border-white/10
+                  bg-black/40
+                  px-3
+                  py-2.5
+                  text-sm
+                  text-white
+                  placeholder:text-white/40
+                  outline-none
+                  focus:border-gold/60
+                "
               />
+
               {results.length > 0 && (
                 <ul className="mt-2 max-h-80 space-y-1 overflow-y-auto">
                   {results.map((r) => (
@@ -97,18 +199,27 @@ export default function Navbar() {
                         href={tmdbUrl(r.type, r.id)}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center gap-3 rounded-[8px] p-2 transition-colors hover:bg-white/5"
+                        className="
+                          flex
+                          items-center
+                          gap-3
+                          rounded-[8px]
+                          p-2
+                          transition-colors
+                          hover:bg-white/5
+                        "
                       >
                         <img
                           src={r.poster}
                           alt=""
                           className="h-14 w-10 rounded-[4px] object-cover"
                         />
+
                         <div className="min-w-0">
-                          <p className="truncate text-sm font-medium text-bone">
+                          <p className="truncate text-sm font-medium text-white">
                             {r.title}
                           </p>
-                          <p className="text-xs text-fog">
+                          <p className="text-xs text-white/60">
                             {r.year} · {r.type === "tv" ? "TV Series" : "Film"}
                           </p>
                         </div>
@@ -117,8 +228,9 @@ export default function Navbar() {
                   ))}
                 </ul>
               )}
+
               {query.trim() && results.length === 0 && (
-                <p className="mt-3 px-1 text-xs text-fog">
+                <p className="mt-3 px-1 text-xs text-white/50">
                   No titles match “{query}”.
                 </p>
               )}

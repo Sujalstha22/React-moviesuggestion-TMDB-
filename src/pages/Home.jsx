@@ -1,287 +1,293 @@
-import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
 
-const classics = [
-  {
-    title: "The Shawshank Redemption",
-    year: 1994,
-    rating: 9.3,
-    poster: "https://image.tmdb.org/t/p/w500/q6y0Go1tsGEsmtFryDOJo3dEmqu.jpg",
-  },
-  {
-    title: "The Godfather",
-    year: 1972,
-    rating: 9.2,
-    poster: "https://image.tmdb.org/t/p/w500/3bhkrj58Vtu7enYsRolD1fZdja1.jpg",
-  },
-  {
-    title: "The Dark Knight",
-    year: 2008,
-    rating: 9.0,
-    poster: "https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg",
-  },
-  {
-    title: "Pulp Fiction",
-    year: 1994,
-    rating: 8.9,
-    poster: "https://image.tmdb.org/t/p/w500/d5iIlFn5s0ImszYzBPb8JPIfbXD.jpg",
-  },
-  {
-    title: "Forrest Gump",
-    year: 1994,
-    rating: 8.8,
-    poster: "https://image.tmdb.org/t/p/w500/arw2vcBveWOVZr6pxd9XTd1TdQa.jpg",
-  },
-  {
-    title: "Inception",
-    year: 2010,
-    rating: 8.8,
-    poster: "https://image.tmdb.org/t/p/w500/9gk7adHYeDvHkCSEqAvQNLV5Uge.jpg",
-  },
-  {
-    title: "Interstellar",
-    year: 2014,
-    rating: 8.7,
-    poster: "https://image.tmdb.org/t/p/w500/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg",
-  },
-  {
-    title: "Fight Club",
-    year: 1999,
-    rating: 8.8,
-    poster: "https://image.tmdb.org/t/p/w500/pB8BM7pdSp6B6Ih7QZ4DrQ3PmJK.jpg",
-  },
-];
+import Hero from "../components/Hero";
+import PosterRow from "../components/PosterRow";
+import FeaturedClassic from "../components/FeaturedClassic";
 
-const Home = () => {
-  const [currentMovie, setCurrentMovie] = useState(0);
+import {
+  getTrendingToday,
+  getPopularMovies,
+  getTopRatedMovies,
+  getPopularTV,
+  getMovieDetails,
+  CLASSIC_IDS,
+} from "../services/api";
+
+export default function Home() {
+  const [trending, setTrending] = useState([]);
+  const [popular, setPopular] = useState([]);
+  const [topRated, setTopRated] = useState([]);
+  const [shows, setShows] = useState([]);
+  const [featuredClassic, setFeaturedClassic] = useState(null);
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentMovie((prev) => (prev + 1) % classics.length);
-    }, 3000);
+    async function loadHome() {
+      try {
+        setLoading(true);
 
-    return () => clearInterval(interval);
+        const randomClassic =
+          CLASSIC_IDS[Math.floor(Math.random() * CLASSIC_IDS.length)];
+
+        const [
+          trendingData,
+          popularData,
+          topRatedData,
+          showsData,
+          classicMovie,
+        ] = await Promise.all([
+          getTrendingToday(),
+          getPopularMovies(),
+          getTopRatedMovies(),
+          getPopularTV(),
+          getMovieDetails(randomClassic),
+        ]);
+
+        setTrending(trendingData);
+        setPopular(popularData);
+        setTopRated(topRatedData);
+        setShows(showsData);
+        setFeaturedClassic(classicMovie);
+      } catch (err) {
+        console.error(err);
+        setError("Something went wrong while loading movies.");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadHome();
   }, []);
+  // -------------------------
+  // Loading State
+  // -------------------------
+  if (loading) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-ink">
+        <div className="flex flex-col items-center gap-5">
+          <div className="h-14 w-14 animate-spin rounded-full border-4 border-charcoal-line border-t-gold-soft" />
+
+          <p className="font-display text-xl italic text-bone">
+            Curating tonight's collection...
+          </p>
+        </div>
+      </main>
+    );
+  }
+
+  // -------------------------
+  // Error State
+  // -------------------------
+  if (error) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-ink px-6">
+        <div className="max-w-md text-center">
+          <h2 className="font-display text-4xl italic text-bone">Oops...</h2>
+
+          <p className="mt-5 leading-8 text-fog">{error}</p>
+
+          <button
+            onClick={() => window.location.reload()}
+            className="mt-8 rounded-xl bg-gold-soft px-6 py-3 font-semibold text-ink transition hover:bg-gold"
+          >
+            Try Again
+          </button>
+        </div>
+      </main>
+    );
+  }
 
   return (
-    <div className="bg-[#0B0F19] text-white overflow-x-hidden">
-      {/* ================= HERO ================= */}
+    <main className="min-h-screen overflow-x-hidden bg-ink text-bone">
+      <Hero />
 
-      <section className="relative min-h-screen flex items-center">
-        <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/10 via-transparent to-blue-500/10" />
+      <PosterRow
+        id="trending"
+        eyebrow="Now Trending"
+        title="Trending Today"
+        items={trending}
+        ranked
+        size="lg"
+      />
 
-        <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-20 items-center px-8 py-20 relative z-10">
-          {/* LEFT */}
+      <PosterRow
+        id="popular"
+        eyebrow="Popular Picks"
+        title="Popular Movies"
+        items={popular}
+      />
+
+      <PosterRow
+        id="top-rated"
+        eyebrow="Highest Rated"
+        title="Critics' Favorites"
+        items={topRated}
+      />
+
+      {/* ---------------- TV Shows ---------------- */}
+
+      <PosterRow
+        id="tv-shows"
+        eyebrow="Binge Worthy"
+        title="Popular TV Shows"
+        items={shows}
+      />
+
+      {/* ---------------- Featured Classic ---------------- */}
+
+      <FeaturedClassic movie={featuredClassic} />
+      {/* ================= About ================= */}
+
+      <section id="about" className="border-t border-charcoal-line/60 py-28">
+        <div className="mx-auto grid max-w-7xl gap-16 px-6 lg:grid-cols-2 lg:px-10">
+          {/* Left */}
 
           <div>
-            <p className="uppercase tracking-[6px] text-yellow-400 font-semibold mb-4">
-              Welcome to CineVerse
-            </p>
-
-            <h1 className="text-5xl lg:text-7xl font-black leading-tight">
-              Discover
-              <span className="text-yellow-400"> Movies </span>
-              Worth Watching.
-            </h1>
-
-            <p className="text-gray-300 mt-8 text-lg leading-8 max-w-xl">
-              Explore blockbuster hits, timeless classics, award-winning
-              masterpieces and trending TV shows from around the world. Search
-              thousands of titles and discover your next favorite movie powered
-              by TMDB.
-            </p>
-
-            <div className="flex gap-5 mt-10">
-              <Link
-                to="/movie"
-                className="px-8 py-4 bg-yellow-400 rounded-xl text-black font-bold hover:bg-yellow-300 transition duration-300 shadow-xl"
-              >
-                Explore Collection →
-              </Link>
-            </div>
-
-            <div className="grid grid-cols-3 gap-8 mt-16">
-              <div>
-                <h2 className="text-4xl font-bold text-yellow-400">10K+</h2>
-                <p className="text-gray-400 mt-2">Movies</p>
-              </div>
-
-              <div>
-                <h2 className="text-4xl font-bold text-yellow-400">5K+</h2>
-                <p className="text-gray-400 mt-2">TV Shows</p>
-              </div>
-
-              <div>
-                <h2 className="text-4xl font-bold text-yellow-400">Daily</h2>
-                <p className="text-gray-400 mt-2">Updated</p>
-              </div>
-            </div>
-          </div>
-
-          {/* RIGHT */}
-
-          <div className="relative flex justify-center">
-            <div className="absolute w-80 h-80 rounded-full bg-yellow-500/20 blur-[120px]" />
-
-            <div className="relative">
-              <div className="bg-[#151C2D] rounded-3xl overflow-hidden shadow-2xl w-[320px] transition-all duration-700">
-                <img
-                  src={classics[currentMovie].poster}
-                  alt={classics[currentMovie].title}
-                  className="w-full h-[480px] object-cover"
-                />
-
-                <div className="p-6">
-                  <h2 className="text-2xl font-bold">
-                    {classics[currentMovie].title}
-                  </h2>
-
-                  <div className="flex justify-between mt-4 text-gray-300">
-                    <span>{classics[currentMovie].year}</span>
-
-                    <span className="text-yellow-400">
-                      ⭐ {classics[currentMovie].rating}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Floating Posters */}
-
-              <img
-                src={classics[(currentMovie + 1) % classics.length].poster}
-                alt=""
-                className="hidden lg:block absolute -left-24 top-10 w-32 rounded-2xl opacity-70 rotate-[-12deg] shadow-xl"
-              />
-
-              <img
-                src={classics[(currentMovie + 2) % classics.length].poster}
-                alt=""
-                className="hidden lg:block absolute -right-24 bottom-10 w-32 rounded-2xl opacity-70 rotate-[10deg] shadow-xl"
-              />
-            </div>
-          </div>
-        </div>
-      </section>
-      {/* ================= ABOUT ================= */}
-
-      <section className="py-24 px-8 bg-[#111827]">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <p className="uppercase tracking-[4px] text-yellow-400 font-semibold">
+            <p className="mb-3 text-xs font-semibold uppercase tracking-[0.32em] text-gold-soft">
               About CineVerse
             </p>
 
-            <h2 className="text-5xl font-bold mt-4">
-              Your Ultimate Movie Discovery Platform
+            <h2 className="font-display text-5xl italic leading-tight text-bone">
+              Built for people who
+              <br />
+              love cinema.
             </h2>
 
-            <p className="text-gray-400 max-w-3xl mx-auto mt-6 text-lg leading-8">
-              CineVerse is built for movie lovers who enjoy discovering
-              unforgettable films and trending TV shows. Whether you're looking
-              for the latest blockbuster or a timeless classic, CineVerse helps
-              you explore entertainment from around the world through a clean
-              and intuitive experience.
+            <p className="mt-8 max-w-xl text-[15px] leading-8 text-fog">
+              CineVerse is a modern movie discovery experience designed to help
+              you find your next favorite film or TV series. Instead of
+              endlessly scrolling through streaming platforms, explore curated
+              collections, trending releases, timeless classics, and critically
+              acclaimed masterpieces—all in one beautifully crafted interface.
             </p>
+
+            <p className="mt-6 max-w-xl text-[15px] leading-8 text-fog">
+              Every movie, TV show, rating, poster, and description is powered
+              by{" "}
+              <a
+                href="https://www.themoviedb.org/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-semibold text-gold-soft transition hover:text-gold"
+              >
+                The Movie Database (TMDB)
+              </a>
+              , one of the world's largest community-driven movie databases.
+            </p>
+
+            <a
+              href="https://developer.themoviedb.org/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="
+                mt-10
+                inline-flex
+                items-center
+                rounded-xl
+                border
+                border-gold-soft/40
+                px-6
+                py-3
+
+                font-medium
+                text-gold-soft
+
+                transition-all
+
+                hover:border-gold
+                hover:bg-gold-soft/10
+              "
+            >
+              Explore TMDB API →
+            </a>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-[#182234] p-8 rounded-3xl hover:-translate-y-2 transition duration-300">
-              <div className="text-5xl mb-6">🎬</div>
+          {/* Right */}
 
-              <h3 className="text-2xl font-bold">Popular Movies</h3>
+          <div className="grid grid-cols-2 gap-6">
+            <div className="rounded-2xl border border-charcoal-line bg-charcoal-soft/40 p-8 backdrop-blur-md">
+              <p className="text-5xl font-display italic text-gold-soft">1M+</p>
 
-              <p className="text-gray-400 mt-4 leading-7">
-                Browse thousands of trending and highly rated movies updated
-                daily from The Movie Database.
+              <p className="mt-3 text-sm uppercase tracking-[0.2em] text-fog">
+                Movies
               </p>
             </div>
 
-            <div className="bg-[#182234] p-8 rounded-3xl hover:-translate-y-2 transition duration-300">
-              <div className="text-5xl mb-6">📺</div>
+            <div className="rounded-2xl border border-charcoal-line bg-charcoal-soft/40 p-8 backdrop-blur-md">
+              <p className="text-5xl font-display italic text-gold-soft">
+                250K+
+              </p>
 
-              <h3 className="text-2xl font-bold">TV Shows</h3>
-
-              <p className="text-gray-400 mt-4 leading-7">
-                Explore the most popular television series from every genre and
-                discover your next binge-worthy show.
+              <p className="mt-3 text-sm uppercase tracking-[0.2em] text-fog">
+                TV Episodes
               </p>
             </div>
 
-            <div className="bg-[#182234] p-8 rounded-3xl hover:-translate-y-2 transition duration-300">
-              <div className="text-5xl mb-6">❤️</div>
+            <div className="rounded-2xl border border-charcoal-line bg-charcoal-soft/40 p-8 backdrop-blur-md">
+              <p className="text-5xl font-display italic text-gold-soft">
+                Daily
+              </p>
 
-              <h3 className="text-2xl font-bold">Favorites</h3>
+              <p className="mt-3 text-sm uppercase tracking-[0.2em] text-fog">
+                Trending Updates
+              </p>
+            </div>
 
-              <p className="text-gray-400 mt-4 leading-7">
-                Save your favorite movies and TV shows so you can revisit them
-                anytime with a single click.
+            <div className="rounded-2xl border border-charcoal-line bg-charcoal-soft/40 p-8 backdrop-blur-md">
+              <p className="text-5xl font-display italic text-gold-soft">
+                Free
+              </p>
+
+              <p className="mt-3 text-sm uppercase tracking-[0.2em] text-fog">
+                TMDB API
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ================= TMDB ================= */}
+      {/* ================= Footer ================= */}
 
-      <section className="py-24 px-8">
-        <div className="max-w-5xl mx-auto bg-gradient-to-r from-[#1A2438] to-[#111827] rounded-3xl p-12 border border-gray-800">
-          <p className="uppercase tracking-[4px] text-yellow-400 font-semibold">
-            Powered By
+      <footer className="border-t border-charcoal-line/60 py-10">
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-5 px-6 text-center text-sm text-fog lg:flex-row lg:px-10">
+          <p>
+            © {new Date().getFullYear()}{" "}
+            <span className="font-display italic text-bone">CineVerse</span>.
+            Crafted for movie lovers.
           </p>
 
-          <h2 className="text-4xl font-bold mt-4">The Movie Database (TMDB)</h2>
+          <div className="flex items-center gap-6">
+            <a
+              href="https://www.themoviedb.org/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="transition hover:text-gold-soft"
+            >
+              TMDB
+            </a>
 
-          <p className="text-gray-400 mt-8 leading-8 text-lg">
-            This website uses the official TMDB API to fetch real-time
-            information about movies and TV shows including posters, ratings,
-            release dates, genres, descriptions, and trending content. The API
-            powers movie search, popular movies, television series, and
-            recommendation features throughout the platform.
-          </p>
+            <a
+              href="https://developer.themoviedb.org/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="transition hover:text-gold-soft"
+            >
+              API Docs
+            </a>
 
-          <a
-            href="https://www.themoviedb.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-block mt-10 bg-yellow-400 text-black font-bold px-8 py-4 rounded-xl hover:bg-yellow-300 transition"
-          >
-            Visit TMDB →
-          </a>
+            <a
+              href="https://github.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="transition hover:text-gold-soft"
+            >
+              GitHub
+            </a>
+          </div>
         </div>
-      </section>
-
-      {/* ================= CALL TO ACTION ================= */}
-
-      <section className="py-24 px-8 text-center bg-gradient-to-r from-yellow-500/10 via-transparent to-yellow-500/10">
-        <h2 className="text-5xl font-bold">Ready for Your Next Movie Night?</h2>
-
-        <p className="text-gray-400 mt-8 text-xl max-w-3xl mx-auto leading-8">
-          Browse thousands of movies and TV shows, discover hidden gems, and
-          build your own collection of favorites.
-        </p>
-
-        <Link
-          to="/movie"
-          className="inline-block mt-12 px-10 py-5 bg-yellow-400 text-black rounded-xl font-bold text-lg hover:bg-yellow-300 transition duration-300"
-        >
-          Explore Collection →
-        </Link>
-      </section>
-
-      {/* ================= FOOTER ================= */}
-
-      <footer className="border-t border-gray-800 py-10 text-center">
-        <h3 className="text-2xl font-bold text-yellow-400">CineVerse</h3>
-
-        <p className="text-gray-500 mt-4">Discover. Watch. Repeat.</p>
-
-        <p className="text-gray-600 mt-8 text-sm">
-          © {new Date().getFullYear()} CineVerse. Built with React & TMDB API.
-        </p>
       </footer>
-    </div>
+    </main>
   );
-};
-
-export default Home;
+}
